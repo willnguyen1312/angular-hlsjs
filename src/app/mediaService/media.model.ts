@@ -5,7 +5,6 @@ export interface BitrateInfo {
 }
 
 export interface Media {
-  id: string;
   // Streaming properties
   fps: number;
   autoBitrateEnabled: boolean;

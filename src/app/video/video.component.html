@@ -1,1 +1,33 @@
-<p>video works!</p>
+<div class="wrapper">
+  <video
+    #video
+    controls
+    (seeking)="mediaService.onSeeking()"
+    (loadedmetadata)="mediaService.onLoadedMetadata()"
+    (ratechange)="mediaService.onRateChange()"
+    (volumechange)="mediaService.onVolumeChange()"
+    (pause)="mediaService.onPause()"
+    (play)="mediaService.onPlay()"
+    (canplay)="mediaService.onCanPlay()"
+    (progress)="mediaService.onProgress()"
+    (waiting)="mediaService.onWaiting()"
+    (timeupdate)="mediaService.onTimeUpdate()"
+    (ended)="mediaService.onEnded()"
+    (playing)="mediaService.onPlaying()"
+    class="video"
+  ></video>
+
+  <p>PlaybackRate: {{ _media.playbackRate }}</p>
+
+  <p>Duration: {{ _media.duration }}</p>
+
+  <p>Volume: {{ _media.volume }}</p>
+
+  <p>Muted: {{ _media.muted }}</p>
+
+  <p>Current time: {{ _media.currentTime }}</p>
+
+  <p>Resolution</p>
+
+  <p>Fps: {{ _media.fps }}</p>
+</div>

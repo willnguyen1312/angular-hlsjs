@@ -1,1 +1,15 @@
-<div class="wrapper">Hello World</div>
+<div class="wrapper">
+  <div class="buttonGroup">
+    <button
+      (click)="selectVideoSource(videoSource.id)"
+      *ngFor="let videoSource of videoSources"
+    >
+      Video {{ videoSource.id + 1 }}
+    </button>
+  </div>
+  <h1>
+    Hello Video
+  </h1>
+
+  <app-video [videoSource]="currentMediaSource"></app-video>
+</div>

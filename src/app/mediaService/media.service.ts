@@ -6,7 +6,6 @@ import { Media, BitrateInfo } from './media.model';
 import { convertTimeRangesToSeconds } from './utils';
 
 const initialMedia: Media = {
-  id: 'angular-hls-js',
   autoBitrateEnabled: true,
   bitrates: [],
   buffered: null,
@@ -26,6 +25,9 @@ const initialMedia: Media = {
 export class MediaService {
   private readonly _media = new BehaviorSubject<Media>(initialMedia);
   private _hls: null | Hls = null;
+  private mediaElement: null | HTMLVideoElement = null;
+  private _currentMediaSource = '';
+  private isPlaying = false;
 
   readonly media$ = this._media.asObservable();
 
@@ -37,12 +39,12 @@ export class MediaService {
     this._media.next(val);
   }
 
-  initHls(mediaSource: string) {
-    const mediaElement = document.getElementById(
-      this.media.id
-    ) as HTMLVideoElement;
+  initHls(mediaSource: string, mediaElement: HTMLVideoElement) {
+    this.mediaElement = mediaElement;
+    this.releaseHls();
 
-    if (Hls.isSupported()) {
+    if (Hls.isSupported() && this._currentMediaSource !== mediaSource) {
+      this._currentMediaSource = mediaSource;
       const newHls = new Hls();
       newHls.attachMedia(mediaElement);
       newHls.on(Hls.Events.MEDIA_ATTACHED, () => {
@@ -86,15 +88,15 @@ export class MediaService {
     }
   }
 
-  getMedia() {
-    const media = document.getElementById(this.media.id);
+  private getMedia() {
+    const media = this.mediaElement;
     if (!media) {
       throw new Error('media element is not available');
     }
     return media as HTMLMediaElement;
   }
 
-  checkMediaHasDataToPlay() {
+  private checkMediaHasDataToPlay() {
     const media = this.getMedia();
     const currentTime = media.currentTime;
     const timeRanges = convertTimeRangesToSeconds(media.buffered);
@@ -118,5 +120,50 @@ export class MediaService {
     }
 
     this.media.duration = this.getMedia().duration;
+  }
+
+  onRateChange() {
+    this.media.playbackRate = this.getMedia().playbackRate;
+  }
+
+  onVolumeChange() {
+    const media = this.getMedia();
+    this.media.muted = media.muted;
+    this.media.volume = media.volume;
+  }
+
+  onPause() {
+    this.media.paused = true;
+    this.isPlaying = false;
+  }
+
+  onPlay() {
+    this.media.paused = false;
+    this.media.ended = false;
+  }
+
+  onCanPlay() {
+    this.media.isLoading = false;
+  }
+
+  onProgress() {
+    this.media.isLoading = false;
+    this.media.buffered = this.getMedia().buffered;
+  }
+
+  onWaiting() {
+    this.media.isLoading = this.checkMediaHasDataToPlay();
+  }
+
+  onTimeUpdate() {
+    this.media.currentTime = this.getMedia().currentTime;
+  }
+
+  onEnded() {
+    this.media.ended = true;
+  }
+
+  onPlaying() {
+    this.isPlaying = true;
   }
 }
