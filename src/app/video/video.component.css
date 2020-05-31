@@ -13,3 +13,7 @@
 .resolution {
   display: flex;
 }
+
+.activeResolution {
+  background-color: lightsalmon;
+}

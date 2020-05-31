@@ -30,9 +30,17 @@
   <p>Resolution</p>
 
   <div class="resolution">
-    <button (click)="mediaService.setCurrentBirateIndex(-1)">Auto</button>
+    <button
+      [class.activeResolution]="_media.autoBitrateEnabled"
+      (click)="mediaService.setCurrentBirateIndex(-1)"
+    >
+      Auto
+    </button>
 
     <button
+      [class.activeResolution]="
+        !_media.autoBitrateEnabled && i === _media.currentBirateIndex
+      "
       (click)="mediaService.setCurrentBirateIndex(i)"
       *ngFor="let bitrate of _media.bitrates; let i = index"
     >
