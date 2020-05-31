@@ -46,6 +46,7 @@ export class MediaService {
     if (Hls.isSupported() && this._currentMediaSource !== mediaSource) {
       this._currentMediaSource = mediaSource;
       const newHls = new Hls();
+      this._hls = newHls;
       newHls.attachMedia(mediaElement);
       newHls.on(Hls.Events.MEDIA_ATTACHED, () => {
         newHls.loadSource(mediaSource);
@@ -94,6 +95,14 @@ export class MediaService {
       throw new Error('media element is not available');
     }
     return media as HTMLMediaElement;
+  }
+
+  private getHls() {
+    const hls = this._hls;
+    if (!hls) {
+      throw new Error('Hls instance is not available');
+    }
+    return hls;
   }
 
   private checkMediaHasDataToPlay() {
@@ -166,4 +175,44 @@ export class MediaService {
   onPlaying() {
     this.isPlaying = true;
   }
+
+  setCurrentTime(currentTime: number) {
+    this.getMedia().currentTime = Math.min(
+      Math.max(currentTime, 0),
+      this.getMedia().duration
+    );
+  }
+
+  setPlaybackRate(playbackRate: number) {
+    this.getMedia().playbackRate = playbackRate;
+  }
+
+  setVolume(volume: number) {
+    this.getMedia().volume = volume;
+  }
+
+  setMuted(muted: boolean) {
+    this.getMedia().muted = muted;
+  }
+
+  setPaused(paused: boolean) {
+    this.media.paused = paused;
+    const media = this.getMedia();
+    if (paused && this.isPlaying) {
+      media.pause();
+    }
+
+    if (!paused && !this.isPlaying) {
+      media.play();
+    }
+  }
+
+  setCurrentBirateIndex = (bitrateIndex: number) => {
+    this.media.autoBitrateEnabled = bitrateIndex === -1;
+    this.media.currentBirateIndex = bitrateIndex;
+    const hlsInstance = this.getHls();
+    if (hlsInstance.currentLevel !== bitrateIndex) {
+      hlsInstance.currentLevel = bitrateIndex;
+    }
+  };
 }
